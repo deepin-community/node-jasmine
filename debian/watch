@@ -1,0 +1,17 @@
+version=4
+opts=\
+dversionmangle=auto,\
+filenamemangle=s/.*?(\d[\d\.-]*@ARCHIVE_EXT@)/node-jasmine-$1/ \
+ https://github.com/jasmine/jasmine-npm/tags .*/archive.*/v?([\d\.]+).tar.gz group
+
+opts=\
+component=jasmine-core,\
+ctype=nodejs,\
+dversionmangle=auto,\
+filenamemangle=s/.*?(\d[\d\.-]*@ARCHIVE_EXT@)/node-jasmine-core-$1/ \
+ https://github.com/jasmine/jasmine/tags .*/archive.*/v?([\d\.]+).tar.gz checksum
+
+# It is not recommended use npmregistry. Please investigate more.
+# Take a look at https://wiki.debian.org/debian/watch/
+opts="searchmode=plain,component=types-jasmine,ctype=nodejs,pgpmode=none,filenamemangle=s/^.*?(\d[\d\.-]*@ARCHIVE_EXT@)/node-types-jasmine-$1/" \
+ https://registry.npmjs.org/@types/jasmine https://registry.npmjs.org/@types/jasmine/-/jasmine-([\d\.]+)@ARCHIVE_EXT@ checksum

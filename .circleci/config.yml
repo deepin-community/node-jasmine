@@ -1,0 +1,101 @@
+# Run tests against supported Node versions
+
+version: 2.1
+
+orbs:
+  win: circleci/windows@4.1.1
+  node: circleci/node@5.0.2
+
+executors:
+  node18:
+    docker:
+      - image: cimg/node:18.0.0 # Latest 18.x
+    working_directory: ~/workspace
+  node16:
+    docker:
+      - image: cimg/node:16.14.2 # Latest 16.x
+    working_directory: ~/workspace
+  node14_latest:
+    docker:
+      - image: cimg/node:14.17.4 # Latest 14.x
+    working_directory: ~/workspace
+  # 14.8 is the first version with top level await in ES modules.
+  node14_8:
+    docker:
+      - image: cimg/node:14.8
+    working_directory: ~/workspace
+  # 14.7 is the last version without top level await in ES modules.
+  node14_7:
+    docker:
+      - image: cimg/node:14.7
+    working_directory: ~/workspace
+  node12_latest:
+    docker:
+    - image: cimg/node:12.22.10 # Latest 12.x
+    working_directory: ~/workspace
+  # 12.17 is the first version with dynamic import() of commonjs modules
+  node12_17:
+    docker:
+    - image: cimg/node:12.17
+    working_directory: ~/workspace
+
+jobs:
+  test:
+    parameters:
+      executor:
+        type: executor
+    executor: << parameters.executor >>
+    steps:
+      - checkout
+      - run:
+          name: Report Node and NPM versions
+          command: echo "Using Node $(node --version) and NPM $(npm --version)"
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Run tests
+          command: npm test
+  test_win:
+    executor:
+      name: win/default
+      shell: bash.exe
+    steps:
+      - checkout
+      - node/install
+      - run:
+          name: Report Node and NPM versions
+          command: echo "Using Node $(node --version) and NPM $(npm --version)"
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Run tests
+          command: npm test
+
+workflows:
+  version: 2
+  push: &push_workflow
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              executor:
+                - node18
+                - node16
+                - node14_latest
+                - node14_8 # first with top level await in ES modules.
+                - node14_7
+                - node12_latest
+                - node12_17 # first with dynamic import() of commonjs modules
+      - test_win
+  cron:
+    <<: *push_workflow
+    triggers:
+      - schedule:
+          # Times are UTC.
+          cron: "0 10 * * *"
+          filters:
+            branches:
+               only:
+                 - main

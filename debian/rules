@@ -1,4 +1,29 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+CHANGELOG_ORDER=$(shell ls release_notes/|perl -MDpkg::Version -ne 'chomp;push @a,$$_}{$$,="\n";print sort {$$c=$$a;$$d=$$b;$$c=~s/\.md//;$$d=~s/\.md//;Dpkg::Version->new("$$d-1") <=> Dpkg::Version->new("$$c-1")} @a')
+
+a:
+	echo $(CHANGELOG_ORDER)
 
 %:
 	dh $@
+
+override_dh_auto_build:
+	cd release_notes; cat $(CHANGELOG_ORDER) >../CHANGELOG.md
+	help2man -N --help-option=-h --version-option=-v \
+		-n 'JavaScript Testing Framework' \
+		bin/jasmine.js >jasmine.1
+
+override_dh_install:
+	dh_install
+	cd debian/node-jasmine/usr/share/nodejs/ && \
+		rm -rvf jasmine*/MIT.LICENSE \
+		jasmine-core/lib/jasmine-core/example
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod +x debian/node-jasmine/usr/share/nodejs/jasmine/bin/jasmine.js

@@ -1,0 +1,16 @@
+Description: make build reproducible
+Author: Yadd <yadd@debian.org>
+Forwarded: not-needed
+Last-Update: 2022-01-28
+
+--- a/jasmine-core/grunt/config/concat.js
++++ b/jasmine-core/grunt/config/concat.js
+@@ -1,7 +1,7 @@
+ var grunt = require('grunt');
+ 
+ function license() {
+-  var currentYear = "" + new Date(Date.now()).getFullYear();
++  var currentYear = "" + new Date(process.env.SOURCE_DATE_EPOCH ? (process.env.SOURCE_DATE_EPOCH * 1000) : Date.now()).getFullYear();
+ 
+   return grunt.template.process(
+       grunt.file.read("grunt/templates/licenseBanner.js.jst"),
