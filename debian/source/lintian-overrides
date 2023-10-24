@@ -1,0 +1,11 @@
+# Same author
+add-component-copyright jasmine-core *
+
+# Generic types-* path
+add-component-copyright types-*
+
+# Embedded Image
+very-long-line-length-in-source-file *jasmine-core/lib/jasmine-core/jasmine.css*
+
+# Authors list
+very-long-line-length-in-source-file *types-jasmine/README.md*

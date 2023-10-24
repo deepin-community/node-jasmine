@@ -1,0 +1,4 @@
+if test "$AUTOPKGTEST_TMP" != ""; then
+	rm -f spec/npm_package_spec.js
+fi
+node ./bin/jasmine.js
